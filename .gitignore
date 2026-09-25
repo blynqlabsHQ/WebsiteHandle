@@ -1,0 +1,11 @@
+# Playwright MCP session output
+.playwright-mcp/
+
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# If a build step ever appears
+node_modules/
+dist/

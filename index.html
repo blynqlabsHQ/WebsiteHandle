@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blynq</title>
+<meta name="description" content="Glasses that give you the social context you cannot see.">
+<!-- Matches --canvas, so the browser chrome does not flash a different ground
+     on load. The page commits to one light world; declaring it stops the UA
+     rendering scrollbars and controls for a dark theme over a light page. -->
+<meta name="theme-color" content="#f5f4f2">
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+
+  html{color-scheme:light}
+
+  body{
+    margin:0;background:var(--canvas);color:var(--ink);
+    font-family:var(--sans);font-size:var(--text);line-height:1.6;
+    letter-spacing:.16px;-webkit-font-smoothing:antialiased;
+    /* Removes the 300ms double-tap-zoom delay on the nav and bento links. The
+       page has no pinch-zoom target of its own, and text zoom is untouched. */
+    touch-action:manipulation;
+    /* Set deliberately rather than left to the UA's translucent blue, which
+       reads as a mis-tap on an off-white ground. */
+    -webkit-tap-highlight-color:rgb(12 10 9 / .06);
+  }
+
+  /* ---------- shared ---------- */
+  .shell{width:var(--shell);margin-inline:auto}
+  .section{padding-block:var(--section)}
+  /* the header is sticky at 60px, so anchored headings would land underneath it */
+  section[id]{scroll-margin-top:76px}
+  .band{background:var(--canvas-soft);border-block:1px solid var(--hairline)}
+
+  .label{font-family:var(--mono);font-size:var(--label);font-weight:500;
+         letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--gap-3)}
+
+  h1,h2,h3{font-family:var(--tight);margin:0;text-wrap:balance}
+  h1{font-size:var(--display-mega);font-weight:200;line-height:1.02;letter-spacing:-.035em}
+  h2{font-size:var(--display-xl); font-weight:200;line-height:1.08;letter-spacing:-.025em}
+  h3{font-size:var(--display-sm); font-weight:400;line-height:1.3; letter-spacing:-.01em}
+  p{margin:0 0 var(--gap-3);max-width:var(--measure);color:var(--body)}
+  p.lead{font-family:var(--tight);font-size:var(--display-lg);font-weight:300;
+         line-height:1.28;letter-spacing:-.02em;color:var(--ink);max-width:20ch}
+  strong{font-weight:500;color:var(--ink)}
+
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:var(--radius)}
+
+  /* ---------- interaction ----------
+     The reference this page is grounded in is almost silent on hover: one
+     shadow tier, one press state. That silence is the guidance. What is added
+     here is the smallest vocabulary that still acknowledges a pointer -
+     nothing new is introduced as a material, so no shadows: this page builds
+     depth from hairlines, background steps and ink, and a shadow would be the
+     only one on the page.
+
+     Every hover moves transform or colour only, never a layout property, and
+     every one of them collapses under reduced motion. The scrub is rigorous
+     about that and the hovers were not, which was an inconsistency rather
+     than a decision. */
+  @media (prefers-reduced-motion:reduce){
+    .head nav a, .head nav a::after, .bento a, .bento a > *,
+    .wordmark::after, .cta .mailto a{transition:none}
+  }
+
+  /* skip link, first thing in the DOM for keyboard and screen reader users */
+  .skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--ink);
+        color:var(--on-ink);padding:.75rem 1.25rem;font-size:var(--text-sm)}
+  .skip:focus{left:1rem;top:1rem}
+
+  /* ---------- header ---------- */
+  .head{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--canvas) 88%,transparent);
+        backdrop-filter:blur(10px);border-bottom:1px solid var(--hairline)}
+  .head__in{width:var(--shell);margin-inline:auto;height:60px;
+            display:flex;align-items:center;justify-content:space-between;gap:var(--gap-3)}
+  /* The descender gesture from the footer lockup, borrowed once: hovering the
+     wordmark drops a short stroke into the space below the q. It is the only
+     decorative hover on the page and it is the page's own motif, not an effect. */
+  .wordmark{font-family:var(--tight);font-size:1.35rem;font-weight:300;letter-spacing:-.03em;
+            text-decoration:none;color:var(--ink);line-height:1;position:relative}
+  .wordmark::after{content:"";position:absolute;right:.06em;bottom:-.34em;
+            width:2px;height:.3em;background:var(--ink);
+            transform:scaleY(0);transform-origin:top;
+            transition:transform .22s var(--ease)}
+  .wordmark:hover::after,.wordmark:focus-visible::after{transform:scaleY(1)}
+
+  .head nav{display:flex;gap:var(--gap-3);font-size:var(--text-sm)}
+  .head nav a{color:var(--muted);text-decoration:none;position:relative;
+              transition:color .2s var(--ease)}
+  /* scaleX rather than animating width or right, so the rule composites */
+  .head nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;
+              background:var(--ink);transform:scaleX(0);transform-origin:left;
+              transition:transform .25s var(--ease)}
+  .head nav a:hover{color:var(--ink)}
+  .head nav a:hover::after{transform:scaleX(1)}
+  .head nav a:active{color:var(--body)}
+  @media (max-width:700px){ .head nav{display:none} }
+
+  /* ---------- 1. hero ---------- */
+  .hero{padding-top:calc(var(--section) * .8);padding-bottom:var(--section)}
+  .hero h1{max-width:14ch}
+  .hero__sub{margin-top:var(--gap-3);font-size:1.15rem;max-width:38ch;color:var(--body)}
+  .hero__plate{margin-top:var(--gap-5);background:var(--plate-top);border-radius:var(--radius);
+               overflow:hidden;aspect-ratio:16/9}
+  .hero__plate img{display:block;width:100%;height:100%;object-fit:cover}
+
+  /* the product card: exactly three claims, never four */
+  .claims{margin-top:calc(var(--gap-4) * -1);position:relative;z-index:2;
+          width:min(100%,30rem);background:var(--surface);
+          border:1px solid var(--hairline);border-radius:var(--radius);
+          padding:var(--gap-4)}
+  .claims ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--gap-2)}
+  .claims li{font-family:var(--mono);font-size:.78rem;font-weight:500;letter-spacing:.09em;
+             text-transform:uppercase;color:var(--ink);display:flex;gap:.75rem;align-items:baseline}
+  .claims li::before{content:"";flex:none;width:14px;height:1px;background:var(--ink);
+                     transform:translateY(-4px)}
+
+  /* ---------- bento entries ---------- */
+  .bento{display:grid;gap:1px;background:var(--hairline);border:1px solid var(--hairline);
+         border-radius:var(--radius);overflow:hidden;
+         grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));margin-top:var(--gap-5)}
+  /* Three coordinated shifts rather than one: the card lifts to the white
+     surface, its content steps 4px toward the reader, and the index number
+     comes up to full ink. Small enough to register as intent rather than as
+     an effect, and no new material - the surface and the ink are both already
+     in the ladder. A press returns it, so a tap is acknowledged on touch,
+     where there is no hover at all. */
+  .bento a{background:var(--canvas);padding:var(--gap-4) var(--gap-3);text-decoration:none;
+           display:flex;flex-direction:column;gap:.4rem;min-height:8.5rem;
+           transition:background .2s var(--ease)}
+  .bento a > *{transition:transform .22s var(--ease),color .2s var(--ease)}
+  .bento a:hover{background:var(--surface)}
+  .bento a:hover > *{transform:translateX(4px)}
+  .bento a:hover .n{color:var(--ink)}
+  .bento a:active > *{transform:translateX(1px)}
+  .bento .n{font-family:var(--mono);font-size:var(--label);color:var(--muted);letter-spacing:.14em}
+  .bento .t{font-family:var(--tight);font-size:1.15rem;font-weight:400;letter-spacing:-.015em;color:var(--ink)}
+  .bento .d{font-size:var(--text-sm);color:var(--muted);line-height:1.45}
+
+  /* ---------- the gap device ----------
+     The one thing on this page that is ours. Human speech as blocks of sound,
+     Blynq's output living only in the measured space between them. */
+  .gapfig{margin:var(--gap-4) 0 0;background:var(--surface);border:1px solid var(--hairline);
+          border-radius:var(--radius);padding:var(--gap-4) var(--gap-3)}
+  .gapfig svg{display:block;width:100%;height:auto}
+  .gapfig figcaption{margin-top:var(--gap-3);font-family:var(--mono);font-size:var(--label);
+                     letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center}
+  .wave rect{fill:var(--hairline-strong)}
+  .gapfig .out{fill:var(--ink)}
+  .gapfig .outtext{font-family:var(--tight);font-size:19px;font-weight:400;fill:var(--ink)}
+  .gapfig .brace{stroke:var(--hairline-strong);stroke-width:1;stroke-dasharray:2 3;fill:none}
+
+  /* ---------- 3. tiers ---------- */
+  .tiers{display:grid;gap:1px;background:var(--hairline);border:1px solid var(--hairline);
+         border-radius:var(--radius);overflow:hidden;margin-top:var(--gap-5)}
+  .tier{background:var(--canvas);padding:var(--gap-4);display:grid;
+        grid-template-columns:7rem 1fr;gap:var(--gap-3)}
+  .tier dt{font-family:var(--mono);font-size:var(--label);letter-spacing:.16em;
+           text-transform:uppercase;color:var(--muted);padding-top:.35rem}
+  .tier dd{margin:0}
+  .tier .h{font-family:var(--tight);font-size:var(--display-sm);font-weight:300;
+           letter-spacing:-.015em;color:var(--ink);display:block;margin-bottom:.4rem}
+  .tier p{margin:0;font-size:var(--text-sm)}
+  @media (max-width:640px){ .tier{grid-template-columns:1fr;gap:var(--gap-1)} }
+
+  /* ---------- 4. privacy ---------- */
+  /* ---------- measured ----------
+     Section 3 of the spine: the proof slot. Figures set in the mono face and
+     tabular, so the column of digits lines up and reads as an instrument
+     panel rather than marketing. No accent, no tile fills: a hairline rule
+     per figure is enough separation, and a row of bordered cards here would
+     spend emphasis the tiers above have already earned. */
+  .measured{margin-top:var(--gap-5);display:grid;gap:0;
+            grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr))}
+  .measured div{border-top:1px solid var(--hairline-strong);padding:var(--gap-3) var(--gap-3) 0 0}
+  .measured dt{font-family:var(--mono);font-size:var(--label);font-weight:500;
+               letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .measured dd{margin:.5rem 0 0;font-family:var(--tight);font-size:var(--display-lg);
+               font-weight:200;letter-spacing:-.02em;color:var(--ink);
+               font-variant-numeric:tabular-nums;line-height:1}
+  .measured dd span{font-size:.4em;font-weight:400;color:var(--muted);
+                    letter-spacing:0;margin-left:.15em}
+  .measured__note{margin-top:var(--gap-4);font-size:var(--text-sm);color:var(--muted)}
+
+  /* ---------- 4. privacy ---------- */
+  .privacy h2{max-width:16ch}
+
+  /* ---------- 5. design + scrub ----------
+     Static state is the default. Motion layers on via [data-motion="on"]. */
+  .scrub{position:relative}
+  .scrub__sticky{position:static}
+  .scrub__canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:var(--plate-top)}
+  /* The captions are the visual layer over the plate and say nothing the prose
+     section below does not already say, so they are aria-hidden and hidden
+     outright once there is no scrub to caption. */
+  .reveal{display:none}
+  [data-motion="on"] .reveal{display:block}
+  .reveal .cap{margin:0 0 .35rem;font-family:var(--mono);font-size:var(--label);letter-spacing:.18em;
+             text-transform:uppercase;color:var(--muted);font-weight:500;max-width:none}
+  /* the measure must sit on the element carrying the display font, or ch
+     resolves against the inherited 16px and the line wraps to a stripe */
+  .reveal p{margin:0;font-family:var(--tight);font-size:var(--display-sm);font-weight:300;
+            line-height:1.28;letter-spacing:-.015em;color:var(--ink);max-width:22ch}
+  .meter{display:none}
+  .meter__fill{height:100%;width:0;background:var(--ink)}
+  .loading{position:absolute;inset:0;display:grid;place-items:center;background:var(--canvas);
+           font-family:var(--mono);font-size:var(--label);letter-spacing:.16em;
+           text-transform:uppercase;color:var(--muted)}
+  .loading[hidden]{display:none}
+
+  [data-motion="on"] .scrub{height:420vh}
+  [data-motion="on"] .scrub__sticky{position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden}
+  [data-motion="on"] .scrub__canvas{height:100%;aspect-ratio:auto}
+  [data-motion="on"] .reveal{position:absolute;left:clamp(1.25rem,5vw,4rem);
+        bottom:clamp(2.5rem,10vh,6rem);margin:0;max-width:none;
+        opacity:0;transform:translateY(10px);
+        transition:opacity .5s var(--ease),transform .5s var(--ease);pointer-events:none}
+  [data-motion="on"] .reveal[data-on="true"]{opacity:1;transform:none}
+  [data-motion="on"] .meter{display:block;position:absolute;left:0;right:0;top:0;
+        height:2px;background:var(--hairline)}
+
+  /* On a phone a 16:9 plate inside a full-height sticky is a band marooned in
+     dead space. Pull the caption up under the plate so they read as one thing. */
+  @media (max-width:700px){
+    [data-motion="on"] .reveal{bottom:auto;top:63%;left:1.25rem;right:1.25rem}
+    [data-motion="on"] .reveal p{max-width:none;font-size:1.35rem}
+  }
+  @media (prefers-reduced-motion:reduce){
+    [data-motion="on"] .scrub{height:auto}
+    [data-motion="on"] .scrub__sticky{position:static;height:auto}
+    [data-motion="on"] .scrub__canvas{height:auto;aspect-ratio:16/9}
+    [data-motion="on"] .reveal{display:none}   /* prose section carries it */
+    [data-motion="on"] .meter{display:none}
+  }
+
+  /* ---------- 6. who ---------- */
+  .who ol{list-style:none;margin:var(--gap-5) 0 0;padding:0;display:grid;gap:0}
+  .who li{border-top:1px solid var(--hairline);padding:var(--gap-4) 0;
+          display:grid;grid-template-columns:3rem 1fr;gap:var(--gap-3);align-items:start}
+  .who li:last-child{border-bottom:1px solid var(--hairline)}
+  .who .n{font-family:var(--mono);font-size:var(--label);color:var(--muted);padding-top:.5rem}
+  .who .t{font-family:var(--tight);font-size:var(--display-sm);font-weight:300;
+          letter-spacing:-.015em;color:var(--ink);display:block;margin-bottom:.3rem}
+  .who p{margin:0;font-size:var(--text-sm)}
+  .who .primary .t::after{content:"Primary";font-family:var(--mono);font-size:.6rem;
+          letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+          border:1px solid var(--hairline-strong);border-radius:var(--radius);
+          padding:.2rem .45rem;margin-left:.75rem;vertical-align:middle}
+  @media (max-width:640px){ .who li{grid-template-columns:1fr;gap:.35rem} }
+
+  /* ---------- 7. get in touch ---------- */
+  .cta{background:var(--canvas-deep);color:var(--on-ink)}
+  .cta h2{color:var(--on-ink);max-width:14ch}
+  .cta p{color:var(--muted-soft)}
+  .cta .label{color:var(--muted-soft)}
+  .cta .mailto{margin-top:var(--gap-4);max-width:none}
+  .cta .mailto a{font-family:var(--tight);font-size:var(--display-lg);font-weight:300;
+        letter-spacing:-.02em;color:var(--on-ink);text-decoration:none;
+        border-bottom:1px solid #44403c;padding-bottom:.15rem;
+        transition:border-color .2s var(--ease)}
+  .cta .mailto a:hover{border-bottom-color:var(--on-ink)}
+  .cta .mailto a:active{color:var(--muted-soft);border-bottom-color:var(--muted-soft)}
+
+  /* The only affordance in the scrub. A sticky section four screens tall gives
+     no sign that scrolling is what drives it, and the progress meter only
+     confirms that after you have already moved. Static, not a looping bounce:
+     a cue that animates forever is motion the reader cannot turn off, and this
+     page does not spend attention that way. It leaves as soon as it is
+     answered, and it never appears on the reduced-motion path, where there is
+     nothing to scrub. */
+  .scrollcue{display:none}
+  [data-motion="on"] .scrollcue{display:block;position:absolute;
+        left:50%;transform:translateX(-50%);bottom:clamp(1rem,3vh,2rem);
+        font-family:var(--mono);font-size:var(--label);letter-spacing:.2em;
+        text-transform:uppercase;color:var(--muted);
+        transition:opacity .4s var(--ease);pointer-events:none}
+  [data-motion="on"] .scrollcue[data-off="true"]{opacity:0}
+
+  /* ---------- footer ---------- */
+  .foot{padding-block:var(--gap-6) var(--gap-5);border-top:1px solid var(--hairline);
+        font-size:var(--text-sm);color:var(--muted)}
+  .foot__in{width:var(--shell);margin-inline:auto;display:flex;flex-wrap:wrap;
+            gap:var(--gap-4);align-items:flex-end;justify-content:space-between}
+  /* The lockup appears exactly once, here, at a size where the descender
+     gesture is legible. The header keeps live text: at 21px the gap would
+     be muddy, and it would drag the header out of alignment. */
+  .foot__mark{display:block;width:200px;height:auto;color:var(--ink)}
+</style>
+</head>
+<body id="top">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="head">
+  <div class="head__in">
+    <a class="wordmark" href="#top">blynq</a>
+    <nav aria-label="Sections">
+      <a href="#tiers">How it works</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#design">Design</a>
+      <a href="#who">Who it is for</a>
+      <a href="#access">Get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- 1. Product, name, claim ------------------------------------------- -->
+  <section class="hero section shell" aria-labelledby="h-hero">
+    <p class="label">Blynq glasses</p>
+    <!-- Was "It knows who is speaking, and when not to say so." Naming a speaker is
+         not a capability the product has, so the first clause now states what it
+         actually does. The turn in the second clause is the point of the line and
+         is kept. -->
+    <h1 id="h-hero">It sees the room, and knows when not to mention it.</h1>
+    <p class="hero__sub">Glasses that give you the social context you cannot see.</p>
+
+    <div class="hero__plate">
+      <!-- Above the fold and the only image every reader gets, including the
+           reduced-motion path where it is also the product film. Fetched at
+           high priority; never lazy. -->
+      <img src="poster.jpg" width="1280" height="720" fetchpriority="high" decoding="async"
+           alt="A pair of matte black Blynq glasses in three-quarter view. A recessed
+                button, a speaker grille and a pinhole microphone sit along the temple arm.">
+    </div>
+
+    <!-- Capability, restraint, form. Exactly three, never four.
+         Claim one was "Knows who is speaking", which promises a name the product
+         does not produce. "What is in the room" covers people without claiming to
+         identify them, and stays the capability claim. -->
+    <div class="claims">
+      <ul>
+        <li>Tells you what is in the room</li>
+        <li>Speaks only in the gaps</li>
+        <li>Open ear. No display.</li>
+      </ul>
+    </div>
+
+    <nav class="bento" aria-label="Jump to a section">
+      <a href="#tiers"><span class="n">01</span><span class="t">Three tiers</span>
+         <span class="d">A tone, a word, or a full answer. Never more than you asked for.</span></a>
+      <a href="#privacy"><span class="n">02</span><span class="t">The room is heard, not kept</span>
+         <span class="d">No audio stored. No faces learned. Your transcript stays yours.</span></a>
+      <a href="#design"><span class="n">03</span><span class="t">Design</span>
+         <span class="d">No display, open ear, reads as eyewear.</span></a>
+      <a href="#who"><span class="n">04</span><span class="t">Who it is for</span>
+         <span class="d">Anyone missing signal in a room.</span></a>
+    </nav>
+  </section>
+
+  <!-- 3. The three tiers ------------------------------------------------- -->
+  <section class="section band" id="tiers" aria-labelledby="h-tiers">
+    <div class="shell">
+      <p class="label">How it works</p>
+      <h2 id="h-tiers">Most of what it tells you is not a sentence.</h2>
+      <p class="lead" style="margin-top:var(--gap-3)">A conversation gives you no room for
+        a paragraph. So it earns every word it spends.</p>
+
+      <figure class="gapfig">
+        <svg viewBox="0 0 960 96" role="img" aria-labelledby="gapfig-t gapfig-d" data-wave>
+          <title id="gapfig-t">How Blynq places a response</title>
+          <desc id="gapfig-d">Two blocks of human speech shown as sound waves, with a
+            measured silence between them. Blynq's response sits inside the silence and
+            never overlaps a speaker.</desc>
+        </svg>
+        <figcaption>Output lives in the silence, never over a speaker</figcaption>
+      </figure>
+
+      <dl class="tiers">
+        <div class="tier">
+          <dt>Tier 0<br>under 200ms</dt>
+          <dd><span class="h">No words at all.</span>
+            <p>Two rising notes mean someone joined the room. Learned in ten minutes,
+               then free forever. This is most of what you hear.</p></dd>
+        </div>
+        <div class="tier">
+          <dt>Tier 1<br>in the gaps</dt>
+          <dd><span class="h">One to four words.</span>
+            <!-- The example was "Sarah." A name is the one cue the product cannot
+                 produce yet, and it is the cue a reader would test first. A
+                 positional cue is the same tier, the same length, and true. -->
+            <p>&ldquo;Someone on your left.&rdquo; Spoken only into detected silence.
+               It will not speak while a human is speaking, and it will drop the cue
+               rather than interrupt.</p></dd>
+        </div>
+        <div class="tier">
+          <dt>Tier 2<br>on request</dt>
+          <dd><span class="h">A full answer, and only if you asked.</span>
+            <p>One press on the temple. Nothing is ever spoken at you unprompted.</p></dd>
+        </div>
+      </dl>
+
+      <!-- The proof slot. Every figure here was taken off the device, not
+           estimated, and each one substantiates a tier above it rather than
+           sitting as a generic stat row. -->
+      <dl class="measured">
+        <div>
+          <dt>A frame across the link</dt>
+          <dd>868<span>ms</span></dd>
+        </div>
+        <div>
+          <dt>Press to spoken answer</dt>
+          <dd>8.9<span>s</span></dd>
+        </div>
+        <div>
+          <dt>A spoken command, decided on the glasses' phone</dt>
+          <dd>1<span>ms</span></dd>
+        </div>
+      </dl>
+      <p class="measured__note">Measured on the device. The radio used to be the slow part of
+        this; it is now under a second of it.</p>
+    </div>
+  </section>
+
+  <!-- 3.5 held: Hear it. Slot reserved in the layout, see BLYNQ_SITE_SPINE.md -->
+
+  <!-- 4. Nothing is recorded --------------------------------------------- -->
+  <!-- 4. The room is heard, not kept ------------------------------------
+       This read "Nothing is recorded. No transcript is stored." That is not
+       what the product does: the exchange is written to the phone on purpose,
+       because reading a conversation back is the only review a blind user
+       gets. The claim now separates the three things that are actually true -
+       no audio kept, no faces learned, transcript owned by the wearer - which
+       is a narrower claim and a stronger one, because it survives being
+       checked. -->
+  <section class="section shell privacy" id="privacy" aria-labelledby="h-privacy">
+    <p class="label">Privacy</p>
+    <h2 id="h-privacy">The room is heard, not kept.</h2>
+    <p style="margin-top:var(--gap-3)">The microphone is there for timing, not identity. It
+      listens for when someone is speaking so the glasses know to stay out of it.
+      <strong>No audio is kept and no faces are learned.</strong></p>
+    <p>What you asked and what you were told stays on your phone. It is the only way to check
+      what a device that speaks actually said.</p>
+    <p>These are worn in public, around people who did not choose to be near a device. Building
+      for that is not a compliance exercise. It is the reason the product can be worn at all.</p>
+  </section>
+
+  <!-- 5. Design -----------------------------------------------------------
+       Named with aria-label, not aria-labelledby: this section has no heading
+       of its own, and it previously pointed at an id (h-design) that does not
+       exist anywhere on the page, which left it unnamed.
+
+       The captions are marked up as paragraphs rather than h3. They used to be
+       headings, which put an h3 between two h2s in a section with no h2 of its
+       own - a level skip - for text that is aria-hidden decoration duplicated
+       in the prose below. They were never headings in any real sense. -->
+  <section class="scrub band" id="design" aria-label="Product film">
+    <div class="scrub__sticky">
+      <div class="meter" aria-hidden="true"><div class="meter__fill" id="meter"></div></div>
+      <canvas class="scrub__canvas" id="canvas" aria-hidden="true"></canvas>
+      <!-- Status for a decorative canvas, so it is hidden rather than announced. -->
+      <div class="loading" id="loading" aria-hidden="true">Loading <span id="pct">0</span>%&hellip;</div>
+      <p class="scrollcue" id="scrollcue" aria-hidden="true">Scroll</p>
+
+      <div class="reveal" data-at="0.18" aria-hidden="true">
+        <p class="cap">The button</p>
+        <p>Press to ask. Nothing is spoken unless you asked for it.</p>
+      </div>
+      <div class="reveal" data-at="0.52" aria-hidden="true">
+        <p class="cap">The speaker</p>
+        <p>Open ear. The real conversation still gets through.</p>
+      </div>
+      <div class="reveal" data-at="0.85" aria-hidden="true">
+        <p class="cap">The microphone</p>
+        <p>Hears the room. Records none of it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The canvas above is decoration. The content lives here, for everyone. -->
+  <section class="section shell" aria-labelledby="h-temple">
+    <p class="label">Design</p>
+    <h2 id="h-temple">Three things on the temple.</h2>
+    <p style="margin-top:var(--gap-3)">There is no display. Every response is spoken, which
+      means nothing on your face can take you out of the room you are in.</p>
+    <dl class="tiers" style="margin-top:var(--gap-5)">
+      <div class="tier">
+        <dt>Button</dt>
+        <dd><p>A single recessed button on the outer temple. It is the only way to ask for a
+          full answer, which is why nothing is ever spoken at you unprompted.</p></dd>
+      </div>
+      <div class="tier">
+        <dt>Speaker</dt>
+        <dd><p>A grille set into the underside of the arm, aimed at your ear rather than into
+          it. Your ear canal stays open, so the room stays audible and the real conversation
+          still gets through.</p></dd>
+      </div>
+      <div class="tier">
+        <dt>Microphone</dt>
+        <dd><p>A pinhole at the hinge. It hears the room in order to know when someone is
+          speaking, and stores no audio.</p></dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- 6. Who it is for ----------------------------------------------------- -->
+  <section class="section band who" id="who" aria-labelledby="h-who">
+    <div class="shell">
+      <p class="label">Who it is for</p>
+      <h2 id="h-who">One channel. A lot of rooms.</h2>
+      <ol>
+        <li class="primary"><span class="n">01</span>
+          <div><span class="t">Blind and low vision adults</span>
+          <p>Professionally active, screen reader fluent, already listening at three to five
+             hundred words a minute. Built to their speed, not to a comfortable demo speed.</p></div></li>
+        <li><span class="n">02</span>
+          <div><span class="t">Anyone in a room too loud, or in a second language</span>
+          <p>A conference floor, a bar, a call in your third language. The signal everyone
+             else reads for free is the first thing noise takes away.</p></div></li>
+        <li><span class="n">03</span>
+          <div><span class="t">Neurodivergent users</span>
+          <p>For anyone who would rather have the social signal stated than inferred, the
+             same channel does the same job.</p></div></li>
+        <li><span class="n">04</span>
+          <div><span class="t">Deafblind users, through a braille display</span>
+          <p>The output layer is abstracted from the speaker. The same cues can arrive on a
+             braille line instead of in your ear.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 7. Get in touch ------------------------------------------------------
+       No form here on purpose. Copy states what we are doing, never what we
+       are missing: a reader outside the company reads a caveat as a weakness,
+       not as candour. -->
+  <section class="section cta" id="access" aria-labelledby="h-access">
+    <div class="shell">
+      <p class="label">Early access</p>
+      <h2 id="h-access">We are building the first cohort now.</h2>
+      <p style="margin-top:var(--gap-3)">We would rather build this with the people who will
+        use it than for them. If that is you, tell us about your room.</p>
+      <p class="mailto"><a href="mailto:hello@blynqlabs.com">hello@blynqlabs.com</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__in">
+    <svg class="foot__mark" viewBox="139.33 -1490.00 4631.67 2280.00" role="img" aria-label="Blynq" focusable="false">
+      <g transform="scale(1,-1)" fill="currentColor">
+        <path transform="translate(0.00,0)" d="M623.3331298828125 -24Q521.9994506835938 -24 453.66632080078125 12.666656494140625Q385.33319091796875 49.33331298828125 343.66693115234375 103.16619873046875Q302.00067138671875 156.99908447265625 279.334228515625 207.997802734375H264.0006103515625V0H139.33154296875V1490H268.000732421875V904.002197265625H279.334228515625Q301.6673583984375 954.334228515625 342.8335876464844 1007.3337707519531Q383.99981689453125 1060.3333129882812 451.8329162597656 1096.4999694824219Q519.666015625 1132.6666259765625 621.999755859375 1132.6666259765625Q759.6666259765625 1132.6666259765625 863.1668395996094 1060.3334045410156Q966.6670532226562 988.0001831054688 1024.6672058105469 858.0002136230469Q1082.6673583984375 728.000244140625 1082.6673583984375 556Q1082.6673583984375 382.999755859375 1025.1672058105469 252.16644287109375Q967.6670532226562 121.3331298828125 864.1668395996094 48.66656494140625Q760.6666259765625 -24 623.3331298828125 -24ZM608.666015625 94.002197265625Q719.3324584960938 94.002197265625 795.9988403320312 155.83526611328125Q872.6652221679688 217.6683349609375 912.6650085449219 322.6678466796875Q952.664794921875 427.6673583984375 952.664794921875 557.3333740234375Q952.664794921875 686.3327026367188 912.9983520507812 789.8321838378906Q873.3319091796875 893.3316650390625 796.9988708496094 953.998046875Q720.6658325195312 1014.6644287109375 608.666015625 1014.6644287109375Q499.33294677734375 1014.6644287109375 423.1665954589844 956.3314514160156Q347.000244140625 897.9984741210938 306.83380126953125 794.8323364257812Q266.6673583984375 691.6661987304688 266.6673583984375 557.3333740234375Q266.6673583984375 423.00054931640625 307.00048828125 318.3343811035156Q347.3336181640625 213.668212890625 423.83331298828125 153.835205078125Q500.3330078125 94.002197265625 608.666015625 94.002197265625Z"/>
+        <path transform="translate(1163.00,0)" d="M268.000732421875 1490V0H139.33154296875V1490Z"/>
+        <path transform="translate(1570.00,0)" d="M229.332763671875 -418Q190.665771484375 -419 157.3323974609375 -411.8333435058594Q123.9990234375 -404.66668701171875 103.9993896484375 -395.33349609375L139.333251953125 -281.9979248046875L154.00006103515625 -285.9979248046875Q245.99969482421875 -312.99749755859375 310.3326721191406 -279.497802734375Q374.6656494140625 -245.99810791015625 418.6656494140625 -124.664794921875L459.9984130859375 -10.6663818359375L49.3316650390625 1118H190.0010986328125L521.3330078125 170.00341796875H531.3331298828125L862.6650390625 1118H1003.33447265625L530.667724609375 -175.9991455078125Q501.00091552734375 -257.33282470703125 457.33404541015625 -311.3330078125Q413.66717529296875 -365.33319091796875 356.6668701171875 -391.6665954589844Q299.66656494140625 -418 229.332763671875 -418Z"/>
+        <path transform="translate(2623.00,0)" d="M268.000732421875 697.9984130859375V0H139.33154296875V1118H264.0006103515625V941.3333740234375H276.66748046875Q316.00079345703125 1027.6666870117188 399.1672668457031 1079.8333435058594Q482.333740234375 1132 605.333984375 1132Q718.333984375 1132 803.6672973632812 1085.1667175292969Q889.0006103515625 1038.3334350585938 936.8339233398438 947.3332824707031Q984.667236328125 856.3331298828125 984.667236328125 723.33251953125V0H855.998046875V715.332275390625Q855.998046875 852.3319091796875 778.8318786621094 933.1648559570312Q701.6657104492188 1013.997802734375 572.6663208007812 1013.997802734375Q485.33331298828125 1013.997802734375 416.33355712890625 975.4979553222656Q347.33380126953125 936.9981079101562 307.6672668457031 866.4982604980469Q268.000732421875 795.9984130859375 268.000732421875 697.9984130859375Z"/>
+        <path transform="translate(3747.00,0)" d="M895.331787109375 -418V207.997802734375H883.998291015625Q861.6651611328125 156.99908447265625 819.8322448730469 103.16619873046875Q777.9993286132812 49.33331298828125 709.9995422363281 12.666656494140625Q641.999755859375 -24 539.9993896484375 -24Q402.99920654296875 -24 299.33233642578125 48.66656494140625Q195.66546630859375 121.3331298828125 138.16531372070312 252.16644287109375Q80.6651611328125 382.999755859375 80.6651611328125 556Q80.6651611328125 728.000244140625 138.66531372070312 858.0002136230469Q196.66546630859375 988.0001831054688 300.33233642578125 1060.3334045410156Q403.99920654296875 1132.6666259765625 541.332763671875 1132.6666259765625Q644.3331909179688 1132.6666259765625 711.8329467773438 1096.4999694824219Q779.3327026367188 1060.3333129882812 820.6655883789062 1007.3337707519531Q861.9984741210938 954.334228515625 883.998291015625 904.002197265625H899.3319091796875V1118H1024.0009765625V-418ZM554.66650390625 94.002197265625Q663.6661987304688 94.002197265625 739.8325500488281 153.835205078125Q815.9989013671875 213.668212890625 856.33203125 318.3343811035156Q896.6651611328125 423.00054931640625 896.6651611328125 557.3333740234375Q896.6651611328125 691.6661987304688 856.8320617675781 794.8323364257812Q816.9989624023438 897.9984741210938 740.499267578125 956.3314514160156Q663.9995727539062 1014.6644287109375 554.66650390625 1014.6644287109375Q443.66668701171875 1014.6644287109375 366.8336486816406 953.998046875Q290.0006103515625 893.3316650390625 250.33416748046875 789.8321838378906Q210.667724609375 686.3327026367188 210.667724609375 557.3333740234375Q210.667724609375 427.6673583984375 250.66751098632812 322.6678466796875Q290.66729736328125 217.6683349609375 367.33367919921875 155.83526611328125Q444.00006103515625 94.002197265625 554.66650390625 94.002197265625Z"/>
+        <!-- The q descender ends at -418. A beat of silence to -556, then the line
+             resumes to -790. Stem width 128.67 is measured off the l, so the mark
+             is the same stroke as the type rather than an approximation of it. -->
+        <rect x="4642.33" y="-790.00" width="128.67" height="234.00"/>
+      </g>
+    </svg>
+    <span>A product of BlynqLabs. blynqlabs.com</span>
+  </div>
+</footer>
+
+<script>
+/* ---------- the gap device ----------
+   Drawn rather than hand-authored so the bar rhythm stays even. Decorative:
+   the SVG carries title and desc, and the tiers below say the same in prose. */
+(function(){
+  const svg = document.querySelector('[data-wave]');
+  if(!svg) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  const mid = 48, W = 960;
+
+  function speech(x0, x1){
+    const g = document.createElementNS(NS,'g');
+    g.setAttribute('class','wave');
+    let x = x0, i = 0;
+    while(x < x1 - 4){
+      // deterministic pseudo-random so the figure is identical every load
+      const h = 6 + Math.abs(Math.sin(i * 1.7) * Math.cos(i * .6)) * 30;
+      const r = document.createElementNS(NS,'rect');
+      r.setAttribute('x', x); r.setAttribute('y', mid - h/2);
+      r.setAttribute('width', 3); r.setAttribute('height', h);
+      r.setAttribute('rx', 1.5);
+      g.appendChild(r);
+      x += 7; i++;
+    }
+    return g;
+  }
+
+  svg.appendChild(speech(0, 370));
+  svg.appendChild(speech(590, W));
+
+  // the gap, marked
+  const brace = document.createElementNS(NS,'path');
+  brace.setAttribute('class','brace');
+  brace.setAttribute('d', `M382 78 L382 86 L578 86 L578 78`);
+  svg.appendChild(brace);
+
+  // Blynq's output, living only inside it: two rising notes
+  [[452, 54],[492, 42]].forEach(([cx,cy]) => {
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('class','out');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',5);
+    svg.appendChild(c);
+  });
+})();
+
+/* ---------- the product scrub ---------- */
+(function(){
+  const TOTAL = 101;
+  const PATH  = i => `frames/blynq_${String(i).padStart(4,'0')}.jpg`;
+
+  const forced  = new URLSearchParams(location.search).get('reduced');
+  const reduced = forced === '1' ? true
+                : forced === '0' ? false
+                : window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const canvas  = document.getElementById('canvas');
+  const ctx     = canvas.getContext('2d', { alpha:false });
+  const section = document.getElementById('design');
+  const loading = document.getElementById('loading');
+  const pct     = document.getElementById('pct');
+  const meter   = document.getElementById('meter');
+  const cue     = document.getElementById('scrollcue');
+  const reveals = [...document.querySelectorAll('.reveal')];
+  const images  = new Array(TOTAL);
+  let current = -1;
+
+  function sizeCanvas(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = canvas.getBoundingClientRect();
+    canvas.width  = Math.round(r.width  * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    current = -1;
+  }
+
+  // The plate is grey at the top and near-white at the base, so one pad colour
+  // fixes one seam and creates the other. Sample each edge separately.
+  let pad = null;
+  function samplePad(img){
+    const t = document.createElement('canvas'); t.width = 1; t.height = 2;
+    const tc = t.getContext('2d', {willReadFrequently:true});
+    tc.drawImage(img, 0, 0, img.width, 2, 0, 0, 1, 1);
+    tc.drawImage(img, 0, img.height-2, img.width, 2, 0, 1, 1, 1);
+    const d = tc.getImageData(0,0,1,2).data;
+    return { top:`rgb(${d[0]},${d[1]},${d[2]})`, bottom:`rgb(${d[4]},${d[5]},${d[6]})` };
+  }
+
+  function draw(i){
+    const img = images[i];
+    if(!img || !img.naturalWidth || i === current) return;
+    current = i;
+    if(!pad) pad = samplePad(img);
+    const cw = canvas.width, ch = canvas.height;
+    const s  = Math.min(cw / img.width, ch / img.height);   // contain: never crop the product
+    const dw = img.width * s, dh = img.height * s;
+    const dx = (cw-dw)/2, dy = (ch-dh)/2;
+    if(dy > 0){
+      ctx.fillStyle = pad.top;    ctx.fillRect(0, 0, cw, Math.ceil(dy));
+      ctx.fillStyle = pad.bottom; ctx.fillRect(0, Math.floor(dy+dh), cw, Math.ceil(dy)+1);
+    }
+    if(dx > 0){
+      ctx.fillStyle = pad.top;
+      ctx.fillRect(0, 0, Math.ceil(dx), ch);
+      ctx.fillRect(Math.floor(dx+dw), 0, Math.ceil(dx)+1, ch);
+    }
+    ctx.drawImage(img, dx, dy, dw, dh);
+  }
+
+  function progress(){
+    const rect = section.getBoundingClientRect();
+    const span = section.offsetHeight - window.innerHeight;
+    return span <= 0 ? 0 : Math.min(1, Math.max(0, -rect.top / span));
+  }
+
+  // One render for a given progress, shared by the scroll handler and the test
+  // hook below. They used to carry a copy each, and the copies drifted the
+  // first time anything new was drawn.
+  function render(p){
+    draw(Math.round(p * (TOTAL - 1)));
+    meter.style.width = (p*100).toFixed(1) + '%';
+    cue.dataset.off = p > 0.02 ? 'true' : 'false';   // answered as soon as they move
+    for(const el of reveals){
+      const at = parseFloat(el.dataset.at);
+      el.dataset.on = (p > at - 0.06 && p < at + 0.12) ? 'true' : 'false';
+    }
+  }
+
+  let ticking = false;
+  function onScroll(){
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { render(progress()); ticking = false; });
+  }
+
+  // Reduced motion: one frame, captions already in flow, no listeners, and
+  // crucially none of the 101 frames are ever requested.
+  if(reduced){
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width; canvas.height = img.height;
+      ctx.drawImage(img,0,0);
+      loading.hidden = true;
+    };
+    img.src = 'poster.jpg';
+    return;
+  }
+
+  document.documentElement.dataset.motion = 'on';
+
+  let loaded = 0;
+  for(let i=0;i<TOTAL;i++){
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      loaded++;
+      pct.textContent = Math.round(loaded/TOTAL*100);
+      if(loaded === TOTAL){ loading.hidden = true; sizeCanvas(); onScroll(); }
+    };
+    img.src = PATH(i);
+    images[i] = img;
+  }
+
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', () => { sizeCanvas(); onScroll(); });
+
+  window.__scrub = { TOTAL, images, sizeCanvas, progress,
+    seek(p){
+      const span = section.offsetHeight - window.innerHeight;
+      window.scrollTo(0, section.offsetTop + p*span);
+      render(p);
+      return Math.round(p*(TOTAL-1));
+    }};
+})();
+</script>
+</body>
+</html>
