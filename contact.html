@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get in touch · Blynq</title>
+<meta name="description" content="We are building the first cohort now. Tell us about your room.">
+<meta name="theme-color" content="#f5f4f2">
+<meta name="color-scheme" content="light">
+<meta property="og:title" content="Get in touch · Blynq">
+<meta property="og:description" content="We are building the first cohort now.">
+<meta property="og:image" content="https://blynqlabs.com/poster.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="head">
+  <div class="head__in">
+    <a class="wordmark" href="index.html">blynq</a>
+    <nav class="nav" aria-label="Main">
+      <ul class="nav__links">
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li><a href="design.html">Design</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="who.html">Who it is for</a></li>
+      </ul>
+      <a class="nav__cta" href="contact.html" aria-current="page">Get in touch</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="sheet"><span class="menu-btn__t">Menu</span><span class="menu-btn__bars" aria-hidden="true"></span></button>
+    </nav>
+  </div>
+</header>
+<div class="sheet" id="sheet" data-open="false" hidden>
+  <nav aria-label="Main, mobile">
+    <ul>
+      <li><a href="index.html"><span class="n">00</span>Home</a></li>
+      <li><a href="how-it-works.html"><span class="n">01</span>How it works</a></li>
+      <li><a href="design.html"><span class="n">02</span>Design</a></li>
+      <li><a href="privacy.html"><span class="n">03</span>Privacy</a></li>
+      <li><a href="who.html"><span class="n">04</span>Who it is for</a></li>
+      <li><a href="contact.html" aria-current="page"><span class="n">05</span>Get in touch</a></li>
+    </ul>
+    <p class="sheet__mail">Or write to <a href="mailto:hello@blynqlabs.com">hello@blynqlabs.com</a></p>
+  </nav>
+</div>
+
+<main id="main">
+
+  <!-- No signup form: there is no backend to take an address, and a form
+       that goes nowhere is worse than none (spine §2.7). This composes an
+       email in the reader's own mail app instead, so nothing is collected
+       by the site, and the plain address stays at display size. -->
+  <section class="section cta" aria-labelledby="h-page">
+    <div class="shell cta__grid">
+      <div>
+        <p class="label">Early access</p>
+        <h1 id="h-page" style="color:var(--on-ink);max-width:14ch">We are building the first cohort now.</h1>
+        <p class="mt-4">We would rather build this with the people who will use it than for them. If that is you, tell us about your room.</p>
+        <p class="mailto"><a href="mailto:hello@blynqlabs.com">hello@blynqlabs.com</a></p>
+      </div>
+
+      <form class="compose" id="compose" action="mailto:hello@blynqlabs.com" method="post" enctype="text/plain" aria-labelledby="compose-h">
+        <p class="label" id="compose-h" style="margin:0">Or start the email here</p>
+        <div class="field">
+          <fieldset>
+            <legend>Which is closest to you?</legend>
+            <div class="opts" style="margin-top:.6rem">
+              <label><input type="radio" name="who" value="I am blind or have low vision" checked><span>Blind or low vision</span></label>
+              <label><input type="radio" name="who" value="I spend time in loud rooms or second languages"><span>Loud rooms, other languages</span></label>
+              <label><input type="radio" name="who" value="I am neurodivergent"><span>Neurodivergent</span></label>
+              <label><input type="radio" name="who" value="I am deafblind"><span>Deafblind</span></label>
+              <label><input type="radio" name="who" value="I work with people who would use this"><span>I work with users</span></label>
+              <label><input type="radio" name="who" value="I am an investor or partner"><span>Investor or partner</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="field">
+          <label for="room">Tell us about your room</label>
+          <textarea id="room" name="room" placeholder="Where you are, who is there, and what you miss."></textarea>
+        </div>
+        <div>
+          <button class="btn btn--light" type="submit">Open in my email app <span class="arr" aria-hidden="true">&rarr;</span></button>
+          <p style="margin-top:var(--gap-2);font-size:var(--text-sm)">It opens a draft in your own mail app. Nothing is sent until you send it.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="h-faq">
+    <div class="split">
+      <div class="split__head rv">
+        <p class="label">Questions</p>
+        <h2 id="h-faq">Before you write.</h2>
+      </div>
+      <div class="split__body rv">
+        <div class="faq" style="margin-top:0">
+          <details>
+            <summary>Does it have a screen?</summary>
+            <div><p>No. There is no display. Every response is spoken, which means nothing on your face can take you out of the room you are in.</p></div>
+          </details>
+          <details>
+            <summary>Does it cover my ears?</summary>
+            <div><p>No. The speaker is a grille on the underside of the arm, aimed at your ear rather than into it. Your ear canal stays open, so the real conversation still gets through.</p></div>
+          </details>
+          <details>
+            <summary>Does it record the people around me?</summary>
+            <div><p>The microphone is there for timing, not identity. It listens for when someone is speaking so the glasses know to stay out of it. No audio is kept and no faces are learned. <a class="tlink" href="privacy.html">More on privacy</a></p></div>
+          </details>
+          <details>
+            <summary>Will it talk over people?</summary>
+            <div><p>No. It speaks only into detected silence, and it drops a cue rather than interrupt. Longer answers come only when you press the temple. <a class="tlink" href="how-it-works.html#try">Watch it in a conversation</a></p></div>
+          </details>
+          <details>
+            <summary>Can I use it with a braille display?</summary>
+            <div><p>The output layer is abstracted from the speaker. The same cues can arrive on a braille line instead of in your ear.</p></div>
+          </details>
+          <details>
+            <summary>How do I get a pair?</summary>
+            <div><p>We are building the first cohort now. Write to us and tell us about your room.</p></div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__in">
+    <div class="foot__grid">
+      <div><p>Glasses that give you the social context you cannot see.</p></div>
+      <nav aria-labelledby="f-product"><h2 id="f-product">Product</h2>
+        <ul><li><a href="how-it-works.html">How it works</a></li><li><a href="design.html">Design</a></li><li><a href="privacy.html">Privacy</a></li></ul></nav>
+      <nav aria-labelledby="f-company"><h2 id="f-company">BlynqLabs</h2>
+        <ul><li><a href="who.html">Who it is for</a></li><li><a href="contact.html" aria-current="page">Get in touch</a></li><li><a href="accessibility.html">Accessibility</a></li></ul></nav>
+      <div><h2>Write to us</h2><ul><li><a href="mailto:hello@blynqlabs.com">hello@blynqlabs.com</a></li></ul></div>
+    </div>
+    <img class="foot__mark" src="wordmark.svg" width="260" height="128" alt="Blynq">
+    <div class="foot__base"><span>A product of BlynqLabs. blynqlabs.com</span><span>&copy; <span data-year>2026</span> BlynqLabs</span></div>
+  </div>
+</footer>
+
+<script>
+/* Build a clean mailto from the composer. Without JS, the form's own
+   mailto action still opens a draft. */
+(function(){
+  const f = document.getElementById('compose');
+  if(!f) return;
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    const who = (f.querySelector('input[name="who"]:checked') || {}).value || '';
+    const room = f.room.value.trim();
+    const subject = 'Blynq early access';
+    const body = (who ? who + '.\n\n' : '') + (room ? 'My room: ' + room + '\n' : 'My room: ');
+    location.href = 'mailto:hello@blynqlabs.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>

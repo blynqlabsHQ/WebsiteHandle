@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · Blynq</title>
+<meta name="description" content="A tone, a word, or a full answer. Blynq speaks only into the silences of a conversation, and never over a person.">
+<meta name="theme-color" content="#f5f4f2">
+<meta name="color-scheme" content="light">
+<meta property="og:title" content="How it works · Blynq">
+<meta property="og:description" content="Most of what it tells you is not a sentence.">
+<meta property="og:image" content="https://blynqlabs.com/poster.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="site.css">
+<script src="site.js" defer></script>
+<script src="simulator.js" defer></script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="head">
+  <div class="head__in">
+    <a class="wordmark" href="index.html">blynq</a>
+    <nav class="nav" aria-label="Main">
+      <ul class="nav__links">
+        <li><a href="how-it-works.html" aria-current="page">How it works</a></li>
+        <li><a href="design.html">Design</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="who.html">Who it is for</a></li>
+      </ul>
+      <a class="nav__cta" href="contact.html">Get in touch</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="sheet"><span class="menu-btn__t">Menu</span><span class="menu-btn__bars" aria-hidden="true"></span></button>
+    </nav>
+  </div>
+</header>
+<div class="sheet" id="sheet" data-open="false" hidden>
+  <nav aria-label="Main, mobile">
+    <ul>
+      <li><a href="index.html"><span class="n">00</span>Home</a></li>
+      <li><a href="how-it-works.html" aria-current="page"><span class="n">01</span>How it works</a></li>
+      <li><a href="design.html"><span class="n">02</span>Design</a></li>
+      <li><a href="privacy.html"><span class="n">03</span>Privacy</a></li>
+      <li><a href="who.html"><span class="n">04</span>Who it is for</a></li>
+      <li><a href="contact.html"><span class="n">05</span>Get in touch</a></li>
+    </ul>
+    <p class="sheet__mail">Or write to <a href="mailto:hello@blynqlabs.com">hello@blynqlabs.com</a></p>
+  </nav>
+</div>
+
+<main id="main">
+
+  <section class="phero shell" aria-labelledby="h-page">
+    <p class="label">How it works</p>
+    <h1 id="h-page">Most of what it tells you is not a sentence.</h1>
+    <p class="lead">A conversation gives you no room for a paragraph. So it earns every word it spends.</p>
+    <div class="phero__meta">
+      <span><b>Tier 0</b> &middot; a tone</span>
+      <span><b>Tier 1</b> &middot; a word</span>
+      <span><b>Tier 2</b> &middot; an answer</span>
+    </div>
+  </section>
+
+  <!-- The window. The research figure is the reason the tiers exist, so it
+       leads the page, and it is sourced on the page rather than asserted. -->
+  <section class="section band" aria-labelledby="h-window">
+    <div class="shell">
+      <div class="split">
+        <div class="split__head rv">
+          <p class="label">The window</p>
+          <h2 id="h-window">A conversation leaves about a fifth of a second.</h2>
+        </div>
+        <div class="split__body rv">
+          <p>Across ten languages, from major world languages to small indigenous communities, people begin their reply within about 200 milliseconds of the other person finishing.
+            <span class="src">Stivers et al., <a href="https://www.pnas.org/doi/10.1073/pnas.0903616106">&ldquo;Universals and cultural variation in turn-taking in conversation&rdquo;</a>, PNAS, 2009</span></p>
+          <p>That is the whole space a device has to work in without talking over someone. So the fastest thing Blynq says is not a word at all.</p>
+        </div>
+      </div>
+
+      <figure class="gapfig rv" role="img" aria-label="Two blocks of human speech shown as sound waves, with a measured silence between them. Blynq's response sits inside the silence and never overlaps a speaker.">
+        <div class="gapfig__labels" aria-hidden="true"><span>Someone speaking</span><span>Blynq</span><span>Someone speaking</span></div>
+        <div class="gapfig__row" aria-hidden="true">
+          <div class="bars" data-bars="80" data-seed="0"></div>
+          <div class="gapfig__out">
+            <div class="notes"><span></span><span></span></div>
+            <p class="gapfig__word">&ldquo;Someone on your left.&rdquo;</p>
+          </div>
+          <div class="bars bars--end" data-bars="80" data-seed="31"></div>
+        </div>
+        <div class="gapfig__brace" aria-hidden="true"><span></span><span></span><span></span></div>
+        <figcaption>Output lives in the silence, never over a speaker</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- The three tiers: the headline capability, not a spec appendix. -->
+  <section class="section shell" id="tiers" aria-labelledby="h-tiers">
+    <div class="rv">
+      <p class="label">Three tiers</p>
+      <h2 id="h-tiers">A tone, a word, or a full answer.</h2>
+    </div>
+    <dl class="rows rv">
+      <div class="row">
+        <dt>Tier 0<br>under 200ms</dt>
+        <dd class="h">No words at all.</dd>
+        <dd><p>Two rising notes mean someone joined the room. Learned in ten minutes, then free forever. This is most of what you hear.</p></dd>
+      </div>
+      <div class="row">
+        <dt>Tier 1<br>in the gaps</dt>
+        <dd class="h">One to four words.</dd>
+        <dd><p>&ldquo;Someone on your left.&rdquo; Spoken only into detected silence. It will not speak while a human is speaking, and it will drop the cue rather than interrupt.</p></dd>
+      </div>
+      <div class="row">
+        <dt>Tier 2<br>on request</dt>
+        <dd class="h">A full answer, and only if you asked.</dd>
+        <dd><p>One press on the temple. Nothing is ever spoken at you unprompted.</p></dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- The simulator. A scripted conversation run on a timeline, so the rules
+       above can be watched rather than read. Blynq's output goes to a polite
+       live region: a screen reader hears exactly what the wearer would, and
+       nothing else, which is the product's own behaviour. Works without
+       sound; sound is opt-in and synthesized in the browser. -->
+  <section class="section band" id="try" aria-labelledby="h-try">
+    <div class="shell">
+      <div class="split">
+        <div class="split__head rv">
+          <p class="label">Try it</p>
+          <h2 id="h-try">Watch where it speaks.</h2>
+        </div>
+        <div class="split__body rv">
+          <p>A short meeting. Press play and follow the playhead: cues land only in the silences, one is dropped rather than interrupt, and the full answer waits for its turn. Turn sound on to hear the cues.</p>
+        </div>
+      </div>
+
+      <div class="sim rv" id="sim">
+        <div class="sim__bar">
+          <div class="sim__ctrls">
+            <button class="btn btn--ink" type="button" id="sim-play" aria-describedby="sim-note">Play</button>
+            <button class="btn btn--line" type="button" id="sim-restart">Restart</button>
+            <label class="toggle"><input type="checkbox" id="sim-sound"> Sound</label>
+          </div>
+          <span class="sim__clock" id="sim-clock" aria-hidden="true">00:00.0</span>
+        </div>
+
+        <div class="sim__track" aria-hidden="true">
+          <div class="sim__lane" id="lane-room"><span class="sim__lane-l">Room</span></div>
+          <div class="sim__lane" id="lane-blynq"><span class="sim__lane-l">Blynq</span></div>
+          <div class="sim__head" id="sim-head"></div>
+        </div>
+
+        <div class="sim__now">
+          <div>
+            <p class="k">In the room</p>
+            <p class="sim__room" id="sim-room">Four people around a table. Press play.</p>
+          </div>
+          <div>
+            <p class="k">In your ear</p>
+            <p class="sim__say is-quiet" id="sim-say" aria-live="polite" aria-atomic="true">Nothing yet.</p>
+          </div>
+        </div>
+        <ol class="sim__log" id="sim-log" aria-label="Transcript on your phone"></ol>
+        <p class="sim__note" id="sim-note">Illustrative conversation, with time compressed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Measured: the proof slot. -->
+  <section class="section shell" aria-labelledby="h-measured">
+    <div class="split">
+      <div class="split__head rv">
+        <p class="label">Measured</p>
+        <h2 id="h-measured">Taken off the device.</h2>
+      </div>
+      <div class="split__body rv">
+        <p>Every figure here is measured on the glasses, not estimated. Each one sits under a tier above it.</p>
+      </div>
+    </div>
+    <dl class="measured rv">
+      <div><dt>A frame across the link</dt><dd>868<span>ms</span><small>From the camera on the glasses to the phone, over the radio.</small></dd></div>
+      <div><dt>Press to spoken answer</dt><dd>8.9<span>s</span><small>One press on the temple to a full tier 2 answer in your ear.</small></dd></div>
+      <div><dt>A spoken command, decided on the glasses' phone</dt><dd>1<span>ms</span><small>Where a spoken command goes is decided on the phone itself.</small></dd></div>
+    </dl>
+    <p class="measured__note">Measured on the device. The radio used to be the slow part of this; it is now under a second of it.</p>
+  </section>
+
+  <div class="shell">
+    <a class="next" href="design.html">
+      <span><span class="label">Next</span><span class="next__t">Design</span></span>
+      <span class="next__arr" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__in">
+    <div class="foot__grid">
+      <div><p>Glasses that give you the social context you cannot see.</p></div>
+      <nav aria-labelledby="f-product"><h2 id="f-product">Product</h2>
+        <ul><li><a href="how-it-works.html" aria-current="page">How it works</a></li><li><a href="design.html">Design</a></li><li><a href="privacy.html">Privacy</a></li></ul></nav>
+      <nav aria-labelledby="f-company"><h2 id="f-company">BlynqLabs</h2>
+        <ul><li><a href="who.html">Who it is for</a></li><li><a href="contact.html">Get in touch</a></li><li><a href="accessibility.html">Accessibility</a></li></ul></nav>
+      <div><h2>Write to us</h2><ul><li><a href="mailto:hello@blynqlabs.com">hello@blynqlabs.com</a></li></ul></div>
+    </div>
+    <img class="foot__mark" src="wordmark.svg" width="260" height="128" alt="Blynq">
+    <div class="foot__base"><span>A product of BlynqLabs. blynqlabs.com</span><span>&copy; <span data-year>2026</span> BlynqLabs</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

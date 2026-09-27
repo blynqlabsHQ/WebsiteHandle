@@ -1,9 +1,9 @@
 # blynq-site
 
-The product page for the Blynq glasses, under BlynqLabs. One page, one product.
+The product site for the Blynq glasses, under BlynqLabs. One product, seven pages.
 
-`index.html` is the whole site: no framework, no build step, no bundler. Open it
-on any static server and it runs.
+Plain HTML, CSS and JS: no framework, no build step, no bundler. Open it on any
+static server and it runs.
 
 ## Run it
 
@@ -31,8 +31,18 @@ Force either path without touching OS settings:
 
 | Where | What |
 |---|---|
-| `index.html` | The page. Markup, tokens' consumers, and the scrub script. |
+| `index.html` | Home. Hero, the gap device, measured figures, the scroll-scrub film. |
+| `how-it-works.html` | The turn-taking window, the three tiers, the conversation simulator. |
+| `design.html` | The object viewer (reader-driven turn), the parts, the decisions. |
+| `privacy.html` | The three-paragraph statement and a ledger restating it. |
+| `who.html` | The four groups, rooms, and sourced scale figures. |
+| `accessibility.html` | The standard the site is held to, and how to report a problem. |
+| `contact.html` | Early access: the address, a mailto composer (no backend), FAQ. |
+| `404.html` | Not found. Root-relative paths, so it works at any URL. |
+| `site.css` / `site.js` | Shared styles and behaviour: menu, motion flag, reveals, gap bars. |
+| `scrub.js` / `simulator.js` / `viewer.js` | Page scripts for home, how-it-works, design. |
 | `tokens.css` | Design tokens, with the contrast reasoning in comments. |
+| `favicon.svg` | The q with its descender gap. |
 | `frames/` | 101 JPEGs, 3.6 MB — the scroll-scrub sequence. |
 | `poster.jpg` | Hero plate, and the film in the reduced-motion path. |
 | `wordmark.svg` | Vector lockup. True glyph outlines, `currentColor`. |
